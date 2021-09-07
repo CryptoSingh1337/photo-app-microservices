@@ -1,7 +1,9 @@
 package com.saransh.photoappuserservice.model.response;
 
+import com.saransh.photoappuserservice.domain.Role;
 import lombok.*;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -19,4 +21,5 @@ public class CreateUserResponseModel {
     private String lastName;
     private String username;
     private String email;
+    private Collection<Role> roles;
 }

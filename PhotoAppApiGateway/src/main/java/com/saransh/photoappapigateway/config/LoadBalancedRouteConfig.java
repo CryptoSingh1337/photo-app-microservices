@@ -21,15 +21,16 @@ public class LoadBalancedRouteConfig {
         return builder.routes()
                 .route("users-ws-users",
                         r -> r.path("/users-ws/api/v1/users/register").or()
-                                .path("/users-ws/users/login").and()
-                                .method(POST)
+                                .path("/users-ws/users/login").or()
+                                .path("/users-ws/api/v1/users/token/refresh").and()
+                                .method(GET, POST)
                                 .filters(f ->
                                         f.rewritePath("/users-ws/(?<segment>.*)",
                                                 "/${segment}"))
                                 .uri("lb://users-ws"))
                 .route("users-ws",
                         r -> r.path("/users-ws/**").and()
-                                .method(GET, PUT, DELETE).and()
+                                .method(GET, POST, PUT, DELETE).and()
                                 .header("Authorization", "Bearer (.*)")
                                 .filters(f ->
                                         f.rewritePath("/users-ws/(?<segment>.*)",

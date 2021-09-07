@@ -2,7 +2,6 @@ package com.saransh.photoappuserservice.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saransh.photoappuserservice.security.filters.CustomAuthenticationFilter;
-import com.saransh.photoappuserservice.security.filters.CustomAuthorizationFilter;
 import com.saransh.photoappuserservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 /**
@@ -44,7 +41,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/**").hasIpAddress(env.getProperty("api.gateway"))
+                .antMatchers("/**").hasIpAddress(env.getProperty("gateway.ip"))
                 .and()
                 .addFilter(authenticationFilter());
     }
