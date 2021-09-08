@@ -21,7 +21,7 @@ public class JwtUtils {
     public JwtUtils(Environment env) {
         this.env = env;
         this.algorithm = Algorithm.HMAC256(Objects
-                .requireNonNull(env.getProperty("jwt.secret")).getBytes());
+                .requireNonNull(env.getProperty("jwt.token.secret")).getBytes());
     }
 
     public DecodedJWT decodedJWT(String token) {

@@ -24,7 +24,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
  * Created by CryptSingh1337 on 9/6/2021
  */
 @Component
-public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
+public class AuthorizationHeaderFilter extends
+        AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
 
     private final JwtUtils jwtUtils;
 

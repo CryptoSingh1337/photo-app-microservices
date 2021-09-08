@@ -20,9 +20,9 @@ public class LoadBalancedRouteConfig {
                                           AuthorizationHeaderFilter authFilter) {
         return builder.routes()
                 .route("users-ws-users",
-                        r -> r.path("/users-ws/api/v1/users/register").or()
+                        r -> r.path("/users-ws/users/register").or()
                                 .path("/users-ws/users/login").or()
-                                .path("/users-ws/api/v1/users/token/refresh").and()
+                                .path("/users-ws/users/token/refresh").and()
                                 .method(GET, POST)
                                 .filters(f ->
                                         f.rewritePath("/users-ws/(?<segment>.*)",

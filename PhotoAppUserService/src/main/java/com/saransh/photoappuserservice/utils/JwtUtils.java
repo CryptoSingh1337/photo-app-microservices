@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -20,29 +22,48 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtils {
 
-    private final Algorithm algorithm;
+    private final Algorithm tokenAlgorithm;
+    private final Algorithm refreshTokenAlgorithm;
+    private final Environment env;
 
-    public JwtUtils(@Value("${jwt.secret}") String jwtSecret) {
-        this.algorithm = Algorithm.HMAC256(jwtSecret.getBytes());
+    public JwtUtils(Environment env) {
+        this.env = env;
+        this.tokenAlgorithm = Algorithm.HMAC256(
+                Objects.requireNonNull(
+                        env.getProperty("jwt.token.secret")
+                ).getBytes());
+        this.refreshTokenAlgorithm = Algorithm.HMAC256(
+                Objects.requireNonNull(
+                        env.getProperty("jwt.refresh.token.secret")
+                ).getBytes());
     }
 
     public String generateAccessToken(User user, String issuer) {
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withExpiresAt(
+                        new Date(System.currentTimeMillis() +
+                                Integer.parseInt(
+                                        Objects.requireNonNull(
+                                                env.getProperty("jwt.token.expiration")
+                                        ))))
                 .withIssuer(issuer)
                 .withClaim("roles", user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
-                .sign(algorithm);
+                .sign(tokenAlgorithm);
     }
 
     public String generateRefreshToken(User user, String issuer) {
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() +
+                        Integer.parseInt(
+                                Objects.requireNonNull(
+                                        env.getProperty("jwt.refresh.token.expiration")
+                                ))))
                 .withIssuer(issuer)
-                .sign(algorithm);
+                .sign(refreshTokenAlgorithm);
     }
 
     public String extractAuthorizationToken(String token) {
@@ -65,6 +86,6 @@ public class JwtUtils {
     }
 
     public JWTVerifier getVerifier() {
-        return JWT.require(algorithm).build();
+        return JWT.require(refreshTokenAlgorithm).build();
     }
 }

@@ -37,7 +37,8 @@ public class CustomFilters {
     @Bean
     @Order(1)
     public GlobalFilter thirdCustomPostFilter() {
-        return ((exchange, chain) -> chain.filter(exchange).then(Mono.fromRunnable(() -> {
+        return ((exchange, chain) -> chain.filter(exchange)
+                .then(Mono.fromRunnable(() -> {
             logger.info("Third Post filter executed....");
         })));
     }
@@ -45,7 +46,8 @@ public class CustomFilters {
     @Bean
     @Order(2)
     public GlobalFilter fourthCustomPostFilter() {
-        return ((exchange, chain) -> chain.filter(exchange).then(Mono.fromRunnable(() -> {
+        return ((exchange, chain) -> chain.filter(exchange)
+                .then(Mono.fromRunnable(() -> {
             logger.info("Fourth Post filter executed....");
         })));
     }
