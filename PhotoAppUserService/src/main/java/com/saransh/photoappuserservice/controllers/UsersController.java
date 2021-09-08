@@ -40,8 +40,9 @@ public class UsersController {
 
     @GetMapping("/status/check")
     public String status() {
-        return "User controller is working on port " +
-                env.getProperty("local.server.port");
+        return "User controller is working on port: " +
+                env.getProperty("local.server.port") + ", secret: " +
+                env.getProperty("jwt.token.secret");
     }
 
     @GetMapping

@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,20 +21,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtils {
 
-    private final Algorithm tokenAlgorithm;
-    private final Algorithm refreshTokenAlgorithm;
     private final Environment env;
 
     public JwtUtils(Environment env) {
         this.env = env;
-        this.tokenAlgorithm = Algorithm.HMAC256(
-                Objects.requireNonNull(
-                        env.getProperty("jwt.token.secret")
-                ).getBytes());
-        this.refreshTokenAlgorithm = Algorithm.HMAC256(
-                Objects.requireNonNull(
-                        env.getProperty("jwt.refresh.token.secret")
-                ).getBytes());
     }
 
     public String generateAccessToken(User user, String issuer) {
@@ -51,7 +40,7 @@ public class JwtUtils {
                 .withClaim("roles", user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
-                .sign(tokenAlgorithm);
+                .sign(getTokenAlgorithm());
     }
 
     public String generateRefreshToken(User user, String issuer) {
@@ -63,7 +52,7 @@ public class JwtUtils {
                                         env.getProperty("jwt.refresh.token.expiration")
                                 ))))
                 .withIssuer(issuer)
-                .sign(refreshTokenAlgorithm);
+                .sign(getRefreshTokenAlgorithm());
     }
 
     public String extractAuthorizationToken(String token) {
@@ -86,6 +75,16 @@ public class JwtUtils {
     }
 
     public JWTVerifier getVerifier() {
-        return JWT.require(refreshTokenAlgorithm).build();
+        return JWT.require(getRefreshTokenAlgorithm()).build();
+    }
+
+    private Algorithm getTokenAlgorithm() {
+        return Algorithm.HMAC256(Objects
+                .requireNonNull(env.getProperty("jwt.token.secret")));
+    }
+
+    private Algorithm getRefreshTokenAlgorithm() {
+        return Algorithm.HMAC256(Objects
+                .requireNonNull(env.getProperty("jwt.refresh.token.secret")));
     }
 }

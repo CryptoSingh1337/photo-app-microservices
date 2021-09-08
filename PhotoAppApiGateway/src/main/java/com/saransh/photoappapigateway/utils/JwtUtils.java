@@ -16,17 +16,19 @@ import java.util.Objects;
 public class JwtUtils {
 
     private final Environment env;
-    private final Algorithm algorithm;
 
     public JwtUtils(Environment env) {
         this.env = env;
-        this.algorithm = Algorithm.HMAC256(Objects
-                .requireNonNull(env.getProperty("jwt.token.secret")).getBytes());
     }
 
     public DecodedJWT decodedJWT(String token) {
-        JWTVerifier verifier = JWT.require(algorithm).build();
+        JWTVerifier verifier = JWT.require(getAlgorithm()).build();
         String authorizationToken = token.substring("Bearer ".length());
         return verifier.verify(authorizationToken);
+    }
+
+    private Algorithm getAlgorithm() {
+        return Algorithm.HMAC256(Objects
+                .requireNonNull(env.getProperty("jwt.token.secret")));
     }
 }

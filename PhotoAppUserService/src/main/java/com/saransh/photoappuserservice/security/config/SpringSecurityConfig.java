@@ -41,7 +41,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/**").hasIpAddress(env.getProperty("gateway.ip"))
+                .antMatchers("/**").permitAll()
                 .and()
                 .addFilter(authenticationFilter());
     }
