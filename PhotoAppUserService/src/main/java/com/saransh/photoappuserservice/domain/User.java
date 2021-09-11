@@ -2,6 +2,7 @@ package com.saransh.photoappuserservice.domain;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,9 +27,8 @@ public class User {
             name = "uuid",
             strategy = "org.hibernate.id.UUIDGenerator")
     @GeneratedValue(generator = "uuid")
+    @Type(type = "uuid-char")
     @Column(
-            length = 36,
-            columnDefinition = "varchar",
             updatable = false,
             nullable = false
     )

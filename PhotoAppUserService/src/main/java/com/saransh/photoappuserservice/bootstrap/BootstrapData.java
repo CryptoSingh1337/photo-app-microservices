@@ -1,7 +1,6 @@
 package com.saransh.photoappuserservice.bootstrap;
 
 import com.saransh.photoappuserservice.domain.Role;
-import com.saransh.photoappuserservice.domain.User;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
 import com.saransh.photoappuserservice.repository.RoleRepository;
 import com.saransh.photoappuserservice.repository.UserRepository;
@@ -27,33 +26,36 @@ public class BootstrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        createAndSaveRole("ROLE_USER");
-        createAndSaveRole("ROLE_MANAGER");
-        createAndSaveRole("ROLE_ADMIN");
-        createAndSaveRole("ROLE_SUPER_ADMIN");
+        if (roleRepository.count() == 0) {
+            createAndSaveRole("ROLE_USER");
+            createAndSaveRole("ROLE_MANAGER");
+            createAndSaveRole("ROLE_ADMIN");
+            createAndSaveRole("ROLE_SUPER_ADMIN");
+        }
         log.debug("Roles saved: {}", roleRepository.count());
 
-        createAndSaveUser(CreateUserRequestModel.builder()
-                .firstName("Margie")
-                .lastName("Walters")
-                .email("margie.walters@example.com")
-                .username("margie")
-                .password("redwings")
-                .build());
-        createAndSaveUser(CreateUserRequestModel.builder()
-                .firstName("Darrell")
-                .lastName("Wright")
-                .email("darrell.wright@example.com")
-                .username("darrell")
-                .password("journey")
-                .build());
-        log.debug("Users saved: {}", userRepository.count());
+        if (userRepository.count() == 0) {
+            createAndSaveUser(CreateUserRequestModel.builder()
+                    .firstName("Margie")
+                    .lastName("Walters")
+                    .email("margie.walters@example.com")
+                    .username("margie")
+                    .password("redwings")
+                    .build());
+            createAndSaveUser(CreateUserRequestModel.builder()
+                    .firstName("Darrell")
+                    .lastName("Wright")
+                    .email("darrell.wright@example.com")
+                    .username("darrell")
+                    .password("journey")
+                    .build());
+            log.debug("Users saved: {}", userRepository.count());
 
-        userService.addRoleToUser("margie", "ROLE_USER");
-        userService.addRoleToUser("darrell", "ROLE_MANAGER");
-        userService.addRoleToUser("darrell", "ROLE_ADMIN");
+            userService.addRoleToUser("margie", "ROLE_USER");
+            userService.addRoleToUser("darrell", "ROLE_MANAGER");
+            userService.addRoleToUser("darrell", "ROLE_ADMIN");
+        }
     }
-
     @Transactional
     public void createAndSaveUser(CreateUserRequestModel user) {
         userService.saveUser(user);
