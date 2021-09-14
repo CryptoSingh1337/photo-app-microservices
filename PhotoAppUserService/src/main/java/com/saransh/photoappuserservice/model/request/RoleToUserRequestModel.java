@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
  * Created by CryptSingh1337 on 9/6/2021
  */
 @Data
-public class RoleToUserRequest {
+public class RoleToUserRequestModel {
     @NotBlank
     private String username;
     @NotBlank
