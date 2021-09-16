@@ -1,7 +1,6 @@
 package com.saransh.photoappapigateway.config;
 
 import com.saransh.photoappapigateway.filter.AuthorizationHeaderFilter;
-import com.saransh.photoappapigateway.utils.JwtUtils;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -36,8 +35,13 @@ public class LoadBalancedRouteConfig {
                                         f.rewritePath("/users-ws/(?<segment>.*)",
                                                         "/${segment}")
                                                 .filter(authFilter.apply(
-                                                        new AuthorizationHeaderFilter.Config()))
-                                ).uri("lb://users-ws"))
+                                                        new AuthorizationHeaderFilter.Config())))
+                                .uri("lb://users-ws"))
+                .route("album-ws",
+                        r -> r.path("/album-ws/**")
+                                .filters(f ->
+                                        f.rewritePath("/album-ws/(?<segment>.*)", "/${segment}"))
+                                .uri("lb://album-ws"))
                 .build();
     }
 }

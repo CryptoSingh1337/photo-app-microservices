@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -18,20 +17,20 @@ import static org.springframework.http.HttpStatus.CREATED;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/{userId}/albums")
+@RequestMapping("/user/{username}/albums")
 public class AlbumController {
 
     private final AlbumService albumService;
 
     @GetMapping
-    public ResponseEntity<List<AlbumResponseModel>> getAllAlbums(@PathVariable UUID userId) {
-        return ResponseEntity.ok(albumService.getAllAlbums(userId));
+    public ResponseEntity<List<AlbumResponseModel>> getAllAlbums(@PathVariable String username) {
+        return ResponseEntity.ok(albumService.getAllAlbums(username));
     }
 
     @PostMapping
     public ResponseEntity<AlbumResponseModel> saveAlbum(
-            @PathVariable UUID userId,
+            @PathVariable String username,
             @Validated @RequestBody AlbumRequestModel album) {
-        return ResponseEntity.status(CREATED).body(albumService.saveAlbum(userId, album));
+        return ResponseEntity.status(CREATED).body(albumService.saveAlbum(username, album));
     }
 }

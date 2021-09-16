@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -27,19 +26,19 @@ public class AlbumServiceImpl implements AlbumService {
     private final AlbumMapper albumMapper;
 
     @Override
-    public List<AlbumResponseModel> getAllAlbums(UUID userId) {
-        log.debug("Retrieving all the albums for the user with ID: {}", userId);
-        return albumRepository.findAllByUserId(userId).stream()
+    public List<AlbumResponseModel> getAllAlbums(String username) {
+        log.debug("Retrieving all the albums for the user with username: {}", username);
+        return albumRepository.findAllByUsername(username).stream()
                 .map(albumMapper::albumToResponseAlbum)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public AlbumResponseModel saveAlbum(UUID userId, AlbumRequestModel album) {
-        log.debug("Saving Album to user with ID: {}", userId);
+    public AlbumResponseModel saveAlbum(String username, AlbumRequestModel album) {
+        log.debug("Saving Album to user with username: {}", username);
         Album tempAlbum = albumMapper.albumRequestToAlbum(album);
-        tempAlbum.setUserId(userId);
+        tempAlbum.setUsername(username);
         Album savedAlbum = albumRepository.save(tempAlbum);
         return albumMapper.albumToResponseAlbum(savedAlbum);
     }

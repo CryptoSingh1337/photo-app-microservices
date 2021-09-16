@@ -4,7 +4,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
-import com.saransh.photoappuserservice.model.request.RoleToUserRequest;
+import com.saransh.photoappuserservice.model.request.RoleToUserRequestModel;
 import com.saransh.photoappuserservice.model.response.CreateUserResponseModel;
 import com.saransh.photoappuserservice.services.UserService;
 import com.saransh.photoappuserservice.utils.JwtUtils;
@@ -89,7 +89,7 @@ public class UsersController {
 
     @PostMapping("/role/add")
     public ResponseEntity<?> addRoleToUser(
-            @Validated @RequestBody RoleToUserRequest userRole) {
+            @Validated @RequestBody RoleToUserRequestModel userRole) {
         service.addRoleToUser(userRole.getUsername(), userRole.getRole());
         return ResponseEntity.ok().build();
     }
