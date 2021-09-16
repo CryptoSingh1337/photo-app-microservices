@@ -4,23 +4,30 @@ import com.saransh.photoappuserservice.domain.Role;
 import com.saransh.photoappuserservice.domain.User;
 import com.saransh.photoappuserservice.mapper.UserMapper;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
+import com.saransh.photoappuserservice.model.response.AlbumResponseModel;
 import com.saransh.photoappuserservice.model.response.CreateUserResponseModel;
+import com.saransh.photoappuserservice.model.response.UserResponseModel;
 import com.saransh.photoappuserservice.repository.RoleRepository;
 import com.saransh.photoappuserservice.repository.UserRepository;
 import com.saransh.photoappuserservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.springframework.http.HttpMethod.GET;
 
 /**
  * Created by CryptSingh1337 on 9/2/2021
@@ -34,14 +41,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final RestTemplate restTemplate;
+    @Value("${api.albums.user}")
+    private String albumsOfAUser;
 
     @Override
     public List<CreateUserResponseModel> getUsers() {
         log.debug("Retrieving all the users");
         List<CreateUserResponseModel> users = new ArrayList<>();
-        userRepository.findAll().forEach(user -> {
-            users.add(mapper.userToResponseUser(user));
-        });
+        userRepository.findAll().forEach(user -> users.add(mapper.userToResponseUser(user)));
         return users;
     }
 
@@ -65,6 +73,16 @@ public class UserServiceImpl implements UserService {
         log.debug("Retrieving user with username: {}", username);
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public UserResponseModel getUserWithAlbums(String username) {
+        UserResponseModel userResponseModel = mapper.userToUserResponseModel(getUser(username));
+        ResponseEntity<List<AlbumResponseModel>> albumResponseModel = restTemplate.
+                exchange(albumsOfAUser, GET, null, new ParameterizedTypeReference<>() {
+        }, username);
+        userResponseModel.setAlbums(albumResponseModel.getBody());
+        return userResponseModel;
     }
 
     @Override

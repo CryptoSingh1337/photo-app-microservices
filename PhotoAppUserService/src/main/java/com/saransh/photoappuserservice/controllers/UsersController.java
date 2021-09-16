@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
 import com.saransh.photoappuserservice.model.request.RoleToUserRequestModel;
 import com.saransh.photoappuserservice.model.response.CreateUserResponseModel;
+import com.saransh.photoappuserservice.model.response.UserResponseModel;
 import com.saransh.photoappuserservice.services.UserService;
 import com.saransh.photoappuserservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,11 @@ public class UsersController {
     @GetMapping
     public ResponseEntity<List<CreateUserResponseModel>> getUsers() {
         return ResponseEntity.ok(service.getUsers());
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserResponseModel> getUser(@PathVariable String username) {
+        return ResponseEntity.ok(service.getUserWithAlbums(username));
     }
 
     @PostMapping("/register")

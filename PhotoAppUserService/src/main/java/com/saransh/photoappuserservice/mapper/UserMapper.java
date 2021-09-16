@@ -3,6 +3,7 @@ package com.saransh.photoappuserservice.mapper;
 import com.saransh.photoappuserservice.domain.User;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
 import com.saransh.photoappuserservice.model.response.CreateUserResponseModel;
+import com.saransh.photoappuserservice.model.response.UserResponseModel;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,4 +13,5 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     User requestUserToUser(CreateUserRequestModel user);
     CreateUserResponseModel userToResponseUser(User user);
+    UserResponseModel userToUserResponseModel(User user);
 }
