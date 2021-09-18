@@ -1,5 +1,8 @@
 package com.saransh.photoappuserservice;
 
+import com.saransh.photoappuserservice.client.FeignErrorDecoder;
+import feign.Logger;
+import feign.codec.ErrorDecoder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -33,5 +36,15 @@ public class PhotoAppUserServiceApplication {
         return builder.setConnectTimeout(Duration.ofSeconds(15))
                 .setReadTimeout(Duration.ofSeconds(5))
                 .build();
+    }
+
+    @Bean
+    public Logger.Level feignLogger() {
+        return Logger.Level.BASIC;
+    }
+
+    @Bean
+    public ErrorDecoder feignErrorDecoder() {
+        return new FeignErrorDecoder();
     }
 }
