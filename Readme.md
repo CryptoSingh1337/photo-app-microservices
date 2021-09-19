@@ -13,6 +13,7 @@ This project is created during a course for learning different micro-service con
 - Created a centralized Config server so that all the global/specific application properties will be fetch from the GitHub [repository](https://github.com/CryptoSingh1337/photo-app-config-server).
 - Created encryption and decryption for the config server using both shared encryption key and asymmetric key.
 - Used RestTemplate and OpenFeign HTTP clients to communicate with other micro-services over http in synchronous manner.
+- Added Resilience4J as circuit breaker so that we can handle the case when service is unavailable. It is used for making services fault tolerant.
 
 ## Tech Stack
 
