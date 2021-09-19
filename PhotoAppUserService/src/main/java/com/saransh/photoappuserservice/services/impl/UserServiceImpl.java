@@ -3,6 +3,7 @@ package com.saransh.photoappuserservice.services.impl;
 import com.saransh.photoappuserservice.client.AlbumServiceClient;
 import com.saransh.photoappuserservice.domain.Role;
 import com.saransh.photoappuserservice.domain.User;
+import com.saransh.photoappuserservice.exceptions.NotFoundException;
 import com.saransh.photoappuserservice.mapper.UserMapper;
 import com.saransh.photoappuserservice.model.request.CreateUserRequestModel;
 import com.saransh.photoappuserservice.model.response.CreateUserResponseModel;
@@ -12,6 +13,8 @@ import com.saransh.photoappuserservice.repository.UserRepository;
 import com.saransh.photoappuserservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder encoder;
 //    private final RestTemplate restTemplate;
     private final AlbumServiceClient albumServiceClient;
+    private final Resilience4JCircuitBreakerFactory circuitBreakerFactory;
 //    @Value("${api.albums.user}")
 //    private String albumsOfAUser;
 
@@ -67,7 +71,7 @@ public class UserServiceImpl implements UserService {
     public User getUser(String username) {
         log.debug("Retrieving user with username: {}", username);
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
 //    @Override
@@ -84,7 +88,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseModel getUserWithAlbums(String username) {
         UserResponseModel userResponseModel = mapper.userToUserResponseModel(getUser(username));
-        userResponseModel.setAlbums(albumServiceClient.getAllAlbums(username));
+        Resilience4JCircuitBreaker albumServiceClientCircuitBreaker =
+                circuitBreakerFactory.create("albumServiceCircuitBreaker");
+        userResponseModel.setAlbums(albumServiceClientCircuitBreaker
+                .run(() -> albumServiceClient.getAllAlbums(username), Throwable -> new ArrayList<>()));
         return userResponseModel;
     }
 
@@ -94,7 +101,7 @@ public class UserServiceImpl implements UserService {
         log.debug("Adding role {} to user {}", roleName, username);
         User user = getUser(username);
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new NotFoundException("Role not found"));
         user.getRoles().add(role);
         userRepository.save(user);
     }

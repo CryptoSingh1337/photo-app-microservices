@@ -13,6 +13,6 @@ import java.util.List;
 @FeignClient(name = "album-ws")
 public interface AlbumServiceClient {
 
-    @GetMapping("/user/{username}/albumss")
+    @GetMapping("/user/{username}/albums")
     List<AlbumResponseModel> getAllAlbums(@PathVariable String username);
 }

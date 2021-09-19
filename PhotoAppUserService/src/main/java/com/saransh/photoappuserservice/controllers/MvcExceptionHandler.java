@@ -2,6 +2,7 @@ package com.saransh.photoappuserservice.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saransh.photoappuserservice.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 /**
  * Created by CryptSingh1337 on 9/2/2021
@@ -36,5 +39,10 @@ public class MvcExceptionHandler {
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<?> invalidRequestPropertyHandler() {
         return ResponseEntity.badRequest().body("Invalid Property values");
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
     }
 }
