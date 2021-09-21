@@ -13,8 +13,10 @@ import com.saransh.photoappuserservice.repository.UserRepository;
 import com.saransh.photoappuserservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder.Resilience4JCircuitBreakerConfiguration;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,7 +42,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder encoder;
 //    private final RestTemplate restTemplate;
     private final AlbumServiceClient albumServiceClient;
-    private final Resilience4JCircuitBreakerFactory circuitBreakerFactory;
+    private final CircuitBreakerFactory<Resilience4JCircuitBreakerConfiguration, Resilience4JConfigBuilder>
+            circuitBreakerFactory;
 //    @Value("${api.albums.user}")
 //    private String albumsOfAUser;
 
@@ -88,7 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseModel getUserWithAlbums(String username) {
         UserResponseModel userResponseModel = mapper.userToUserResponseModel(getUser(username));
-        Resilience4JCircuitBreaker albumServiceClientCircuitBreaker =
+        CircuitBreaker albumServiceClientCircuitBreaker =
                 circuitBreakerFactory.create("albumServiceCircuitBreaker");
         userResponseModel.setAlbums(albumServiceClientCircuitBreaker
                 .run(() -> albumServiceClient.getAllAlbums(username), Throwable -> new ArrayList<>()));
